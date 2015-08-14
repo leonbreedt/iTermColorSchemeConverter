@@ -9,7 +9,7 @@ import AppKit
 extension ITermColorScheme {
   internal class func load(path: String) -> ITermColorScheme? {
     guard let dict = NSDictionary(contentsOfFile: path) else { return nil }
-    let name = path.lastPathComponent.stringByDeletingPathExtension
+    let name = path.ns.lastPathComponent.ns.stringByDeletingPathExtension
     return ITermColorScheme(name: name, dict: dict)
   }
 }
@@ -41,14 +41,17 @@ extension ColorScheme {
 }
 
 extension String {
+  var ns: NSString {
+    get { return (self as NSString) }
+  }
   var fullPath: String {
     get {
-      let path = stringByStandardizingPath
-      var directory = path.stringByDeletingLastPathComponent
+      let path = ns.stringByStandardizingPath
+      var directory = path.ns.stringByDeletingLastPathComponent
       if directory.characters.count == 0 {
         directory = NSFileManager.defaultManager().currentDirectoryPath
       }
-      return directory.stringByAppendingPathComponent(path)
+      return directory.ns.stringByAppendingPathComponent(path)
     }
   }
 }
@@ -61,7 +64,7 @@ func convertToTerminalScheme(itermFilePath: String, terminalFilePath: String) {
   
   print("converting \(itermFilePath) -> \(terminalFilePath)")
   
-  let schemeName = terminalFilePath.lastPathComponent.stringByDeletingPathExtension
+  let schemeName = terminalFilePath.ns.lastPathComponent.ns.stringByDeletingPathExtension
   let terminalSettings = TerminalSettings(name: schemeName)
   itermScheme.copyTo(terminalSettings)
 
@@ -75,8 +78,8 @@ if Process.arguments.count > 1 {
   let fileNames = Process.arguments[1..<Process.arguments.count]
   for fileName in fileNames {
     let inputFilePath = fileName.fullPath
-    let inputFolderPath = inputFilePath.stringByDeletingLastPathComponent
-    let schemeName = inputFilePath.lastPathComponent.stringByDeletingPathExtension
+    let inputFolderPath = inputFilePath.ns.stringByDeletingLastPathComponent
+    let schemeName = inputFilePath.ns.lastPathComponent.ns.stringByDeletingPathExtension
     let outputFilePath = "\(inputFolderPath)/\(schemeName).terminal"
     convertToTerminalScheme(inputFilePath, terminalFilePath: outputFilePath)
   }
